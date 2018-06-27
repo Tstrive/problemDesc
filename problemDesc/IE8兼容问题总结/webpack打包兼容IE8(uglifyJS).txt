@@ -1,0 +1,26 @@
+代码压缩 uglifyJS
+这个问题比较大，不过还好可以通过配置来解决。
+首先，webpack3 的插件 uglifyjs-webpack-plugin 
+目前只支持 uglify-js 2.x 系列。
+所以必须确保 uglify-js 是2.x 版本。
+
+说先明确下，uglifyJS 默认压缩，
+不兼容 IE8 的，但是它有一个配置，可以兼容 IE8。
+
+--screw-ie8 开启后，不支持IE6/7/8。
+但是可以关闭啊。默认是开启的。
+--support-ie8 也行，等同于设置 balabala 很多兼容 IE 的参数。
+
+这里有个坑，那就是：uglifyjs-webpack-plugin 不支持 --support-ie8 这个参数。issue 见此
+所以换成 --screw-ie8 就好了。具体配置如下：
+new UglifyJSPlugin({
+    compress: {screw_ie8: false},
+    output: {screw_ie8: false},
+    mangle: {
+      screw_ie8: false, 
+      except: ['$']
+    },
+    support_ie8: true
+})
+默认安装webpack时候就有安装uglifyjs
+使用new webpack.optimize.UglifyJSPlugin({同上配置项})

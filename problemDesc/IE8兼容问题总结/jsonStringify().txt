@@ -1,0 +1,16 @@
+解决IE8 内置JSON.stringify,中文变unicode的问题
+<script>
+    var stringified = JSON.stringify("?????? olé");
+    alert(stringified);
+</script>
+
+项目中出现在IE下出现把json对象转为json串中文变成unicode的问题，
+最后经过排查，发现是IE8内置JSON.stringify()引起的，解决方法如下：
+<script>
+    var stringified = JSON.stringify("?????? olé");
+    stringified  = unescape(stringified.replace(/\\u/g, '%u'));
+    alert(stringified);
+</script>
+ 
+参考网址
+https://stackoverflow.com/questions/2570757/how-to-correct-character-encoding-in-ie8-native-json

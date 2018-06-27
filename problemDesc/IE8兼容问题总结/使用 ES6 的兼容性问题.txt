@@ -1,0 +1,114 @@
+在线参考网址https://segmentfault.com/a/1190000005128101
+
+1.polyfill
+  由于 Babel 默认只转换转各种 ES2015 语法，而不转换新的 API，
+  比如 Promise，以及 Object.assign、Array.from 这些新方法，
+  这时我们需要提供一些 ployfill 来模拟出这样一个提供原生支持功能的浏览器环境
+  主要有两种方式：babel-runtime 和 babel-polyfill。  
+ 
+1.1babel-runtime
+   babel-runtime 的作用是模拟 ES2015 环境，
+   包含各种分散的 polyfill 模块，我们可以在自己的模块里单独引入，
+   比如 promise：
+   import 'babel-runtime/core-js/promise'
+
+   它们不会在全局环境添加未实现的方法，
+   只是这样手动引用每个 polyfill 会非常低效，
+   我们可以借助 Runtime transform 插件来自动化处理这一切。
+   首先使用 npm 安装：
+   npm install babel-plugin-transform-runtime --save-dev
+   然后在 webpack 配置文件的 babel-loader 增加选项：
+   loader: ["babel-loader"],
+   query: {
+      plugins: [
+        "transform-runtime"
+      ],
+      presets: ['es2015', 'stage-0']
+   }
+
+1.2babel-polyfill
+   而 babel-polyfill 是针对全局环境的，
+   引入它浏览器就好像具备了规范里定义的完整的特性，一旦引入，
+   就会跑一个 babel-polyfill 实例。用法如下：
+   1.安装 babel-polyfill
+   npm install babel-polyfill --save
+   2.在入口文件中引用：
+   import 'babel-polyfill'
+
+1.3小结
+   其实做到这些，在大部分浏览器就可以正常跑了，
+   但我们做的是一个用户环境很不确定的产品，
+   对一些年代久远但又不容忽视的运行环境，比如 IE8，我们做的还不够。
+
+2.0开始在 IE8 运行
+   第一步，我们把 jQuery 换成 1.12.1 ，因为 2.X 已经不再支持 IE8。
+
+2.1default or catch
+   这是遇到的第一个问题。在兼容性测试过程中，对下面的代码：
+   function _interopRequireDefault(obj) { 
+       return obj && obj.__esModule ? obj : { default: obj }; }
+   或者这种：
+   module.exports = _main2.default;
+   在 IE8 下会直接报”缺少标识符、字符串或数字”的错。
+   我们得在对象的属性上加 '' 才可以。就像下面这样：
+   function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : { 'default': obj };
+       }
+
+    module.exports = _main2['default']; 
+
+    至于原因，并不是 IE8 下对象的属性必须得加 '' 才行，
+    而是 default 的问题，作为一个关键字，同样的问题还包括 catch。
+
+    这两种情况，可以通过使用 transform-es3-property-literals 
+    和 transform-es3-member-expression-literals 这两个插件搞定。 
+
+2.2es5-shim、es5-sham  
+    为了兼容像 IE8 这样的老版本浏览器，我们引入 es5-shim 作为 polyfill。
+    但在遇到 Object.defineProperty 仍提示 "对象不支持此操作"
+    其实 es5-shim 明确说明，这个方法的 polyfill 在 IE8 会失败，
+    因为 IE8 已经有个同名的方法，但只是用于 DOM 对象。  
+    同样的问题还包括 Object.create，上述问题可以再引入 es5-sham 解决.
+     
+2.3addEventListener
+    项目中有部分代码直接使用 addEventListener 这个 API，
+    但在 IE8 下的事件绑定并不是这个方法。
+    这个问题很容易解决，也无需去写额外的 polyfill。
+    我们已经把 jQuery 换成 1.x，
+    所以只需把代码中 addEventListener 换成 jQuery 的写法就 Okay 了。
+
+2.4无法获取未定义或 null 引用的属性
+    这个问题是在特定场景下【转人工】出现的，
+    出现问题的不是 IE8，而是 IE9 和 IE10。
+    原因是 ocs 实例创建失败，因为没有调用父类的构造函数。
+    通过安装 transform-es2015-classes 和 transform-proto-to-assign 解决。
+    在配置项加上这两个插件的配置：
+    {
+      "plugins": [
+           ["transform-es2015-classes", { "loose": true }],
+           "transform-proto-to-assign"
+           ]
+     }
+
+2.5postMessage
+    虽然 postMessage 是 HTML5 的特性，
+    但 IE8 和 Firefox3 很早就实现了这个 API，当然，跟后来的标准并不一致。
+    这其实也不能怪 IE8。
+    我们可能会这样去使用：
+    parent.postMessage({success: 'ok', name: ‘mirreal’}, ‘*’);
+    但是为了兼容 IE8，我们得转成字符串：
+    var syncronouse = true;
+    window.onmessage = function () {
+          console.log(syncronouse); // 在 IE8 下会在控制台打印 true
+    };
+    window.postMessage('test', '*');
+    syncronouse = false;
+
+2.6IE8/IE9 的控制台
+    if (window.console) {
+       console.log('log here');
+     }
+    使用console polyfill  
+
+2.7定义文档兼容性
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />

@@ -1,0 +1,179 @@
+线上官网地址：http://www.schillmania.com/projects/soundmanager2/
+
+SoundManager是 一个JavaScript库，通过它开发者可以控制Web上音频和视频的播放，它包装了Flash sound API，通过JavaScript和ActionScript和通信，来实现了多媒体的互动，所以浏览器需要启用相关版本以上的Flash Player插件（当然这不是问题）。这里介绍一下它的用法：
+
+首先需要在HTML页面中包含js库
+<script type="text/javascript" src="soundmanager2.js"></script>
+
+初始化正常后播放一段声音
+soundManager.url='swf';
+soundManager.onload=function(){
+ soundManager.play('sound_id', 'assets/sample.mp3');
+}
+
+判断初始化是否正常
+soundManager.onready(function(status){
+ if(status.success){
+  soundManager.play('sound_id', 'assets/sample.mp3');
+ }else{
+  alert("soundManager出现异常");
+ }
+});
+
+创建一个声音对象
+soundManager.onload=function(){
+ var sound=soundManager.createSound({
+  id: 'sound_id', 
+  url: 'assets/sample.mp3',
+  autoPlay:false //same as default
+ });
+ sound.play();
+}
+
+通过ID播放声音
+soundManager.onload=function(){
+ var sound=soundManager.createSound({
+  id: 'sound_id', 
+  url: 'assets/sample.mp3'
+ });
+ soundManager.play('sound_id');
+}
+
+设置播放属性
+soundManager.onload=function(){
+ var sound=soundManager.createSound({
+  id: 'sound_id', 
+  url: 'assets/sample.mp3',
+  autoLoad:true
+ });
+ sound.play({
+  duration:1000,
+  volume:80,
+  span:50,
+  onfinish:function(){
+   this.play();
+  }
+ });
+}
+soundManager.onload=function(){
+ var sound=soundManager.createSound({
+  id: 'sound_id', 
+  url: 'assets/sample.mp3'
+ });
+ sound.setPosition(1000);
+ sound.setVolume(80);
+ sound.play({pan:-50});
+}
+
+控制暂停，播放，静音，取消静音
+sound.play();//播放
+sound.pause();//暂停
+sound.togglePause();//切换
+ 
+sound.mute();//静音
+sound.unmute();//取消静音
+sound.toggleMute();//切换
+
+监听声音加载
+soundManager.onload=function(){
+ var sound=soundManager.createSound({
+  id: 'sound_id', 
+  url: 'assets/bad_path.mp3',
+  onload:function(success){
+   soundManager._writeDebug('sound '+ (success?'loaded':'did not load.');
+  }
+ });
+}
+
+监听播放结束
+soundManager.onload=function(){
+ var sound=soundManager.createSound({
+  id: 'sound_id', 
+  url: 'assets/sample.mp3',
+  onfinish:function(){
+   this.destruct();
+  }
+ });
+}
+
+监听其他事件
+soundManager.onload=function(){
+ var sound=soundManager.createSound({
+  id: 'sound_id', 
+  url: 'assets/sample.mp3',
+  onbeforefinishtime:1000,
+  stream:true,
+  whileloading:function(){},
+  onload:function(){},
+  onfinish:function(){},
+  onplay:function(){},
+  onstop:function(){},
+  onpause:function(){},
+  onresume:function(){},
+  whileplaying:function(){},
+  onbeforefinish:function(){},
+  onbeforefinishcomplete:function(){},
+  onjustbeforefinish:function(){},
+  onjustbeforefinishcomplete:function(){}
+ });
+}
+
+获得sound相关属性
+sound.bytesLoaded
+sound.bytesTotal
+sound.position
+sound.duration
+sound.id3
+
+soundManager的配置属性
+oundManager.allowPolling = true;   
+// 启用状态更新，如果需要监听whileloading/whileplaying则必须启用它
+ 
+soundManager.consoleOnly = false;  
+// 如果启用了, 则调试到id为soundmanager-debug的DIV
+ 
+soundManager.debugMode = true;      
+//是否启用调试信息， (输出到div#soundmanager-debug，或者console)
+ 
+soundManager.flashLoadTimeout =1000;
+// 等待影片加载的毫秒数 (0 = infinity)
+soundManager.flashVersion = 8;
+// 所需Flash Player的版本
+ 
+soundManager.nullURL = 'null.mp3';  
+// (只使用Flash 8): 一个空的辅助MP3文件路径
+ 
+soundManager.url = '/path/to/swf/'; 
+// 存放SM2 .SWF文件的文件夹路径
+ 
+soundManager.useConsole = true;     
+// 如果firebug/safari console.log()可用，则使用它
+ 
+soundManager.useMovieStar = false;  
+// 使用支持 Flash 9.0r115+ MPEG4音频和视频
+ 
+soundManager.useFastPolling = false;
+// 默认是200ms跟新一个播放信息，如果启用快速跟新，时间间隔将是1ms
+ 
+soundManager.useHighPerformance = false;
+// 使用CSS position:fixed来增强JS/AS的调度
+ 
+soundManager.waitForWindowLoad = false; 
+// window.onload()之后才调用oundManager.onload()
+ 
+soundManager.wmode = 'transparent';     
+// null, window, transparent, opaque (后两个可以让HTML处于flash上层)
+ 
+soundManager.allowFullScreen = true;    
+// 是否允许全屏
+
+soundManager部分方法
+soundManager.canPlayURL(mediaURL:string):Boolean;
+soundManager.createSound(id:string,url:string):SMSound;
+soundManager.createSound(options:object):SMSound;
+soundManager.createVideo(options:object):SMSound;
+soundManager.destroySound(id:string);
+soundManager.destroyVideo(id:string);
+soundManager.onready(callback:function(status),[scope]);
+soundManager.loadFromXML(xmlURL:string);
+soundManager.supported():Boolean;
