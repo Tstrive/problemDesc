@@ -1,0 +1,31 @@
+标题：ztree简单使用说明
+
+1.引入相关的js,css,img文件
+
+2.html中必须要有文档说明 <!DOCTYPE html>
+
+3.创建树节点容器ztree,设置容器节点class=ztree
+
+4.方法体声明
+
+<script>
+   var zTreeObj;
+
+   // zTree 的参数配置。
+   var setting = {};
+
+   // zTree 的数据属性（树节点数据，一般为数组。以下只是一种数据格式，还存在别的数据格式，具体看setting配置项的配置）
+   var zNodes = [
+   	{name:"test1", open:true, children:[
+      		{name:"test1_1"}, {name:"test1_2"}]},
+   	{name:"test2", open:true, children:[
+      		{name:"test2_1"}, {name:"test2_2"}]}
+   ];
+    
+   //初始化树节点
+   $(document).ready(function(){
+       zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+   });
+</script>
+
+5.api网址：http://www.treejs.cn/v3/api.php
