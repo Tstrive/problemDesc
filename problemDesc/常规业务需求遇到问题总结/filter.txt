@@ -1,0 +1,24 @@
+filter的用法
+
+<script>
+var ages = [32, 33, 16, 40];
+
+function checkAdult(age) {
+    return age >= 18;
+}
+
+var arr=ages.filter(checkAdult);
+
+</script>
+
+用法：array.filter(function(currentValue,index,arr), thisValue)
+
+1.function(currentValue, index,arr)必须。函数，数组中的每个元素都会执行这个函数
+函数参数:
+currentValue 必须。当前元素的值
+index 可选。当前元素的索引值
+arr 可选。当前元素属于的数组对象
+
+默认会返回一个新数组，需要变量接收
+
+参考：https://www.liaoxuefeng.com/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000/0014351219769203e3fbe1ed611475db3d439393add8997000
